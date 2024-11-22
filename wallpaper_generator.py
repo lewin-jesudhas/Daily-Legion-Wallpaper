@@ -22,7 +22,7 @@ try:
         print("No overlay detected, proceeding.")
 
     # Find all image divs
-    image_divs = driver.find_elements(By.CLASS_NAME, "w-full")  # Adjust the class name if necessary
+    image_divs = driver.find_elements(By.CLASS_NAME, "w-full.h-full.bg-cover")  # Adjust the class name if necessary
 
     # Select the first image (or a random one)
     if image_divs:
