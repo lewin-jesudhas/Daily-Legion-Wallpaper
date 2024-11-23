@@ -1,16 +1,20 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+import requests
 import time
+import random
 
+# Configuration
 WEBSITE_URL = "https://gaming.lenovo.com/wallpapers"
 
+# Initialize WebDriver
 options = webdriver.ChromeOptions()
 driver = webdriver.Chrome(options=options)
 
 try:
     driver.get(WEBSITE_URL)
-    time.sleep(15)  
+    time.sleep(15)
 
     # Handle cookie consent or overlay (if present)
     try:
@@ -24,28 +28,28 @@ try:
     # Find all image divs
     image_divs = driver.find_elements(By.CLASS_NAME, "w-full.h-full.bg-cover")  # Adjust the class name if necessary
 
-    # Select the first image (or a random one)
     if image_divs:
-        #selected_image = image_divs[0]  # Automatically pick the first image
-        # To select a random image:
-        import random
         selected_image = random.choice(image_divs)
         actions = ActionChains(driver)
         actions.move_to_element(selected_image).perform()
         time.sleep(1)  # Allow the page to stabilize
         selected_image.click()
-        print("Image selected and clicked.")
-        time.sleep(15)  # Wait for the wallpaper details page to load
+        print("Image div selected and clicked.")
+        time.sleep(15)  # Wait for the image details page to load
 
-        # Click the "Download 4K" button
-        download_4k_xpath = "/html/body/div[1]/div/div[1]/div/main/div/div/div[2]/div[2]/div/div/div/div[1]/a"
-        download_button = driver.find_element(By.XPATH, download_4k_xpath)
-        
-        # Scroll into view and click the download button
-        actions.move_to_element(download_button).perform()
-        download_button.click()
-        print("Download initiated.")
-        time.sleep(10)  # Wait for the download to complete
+        # Locate the image tag and extract the 'src' attribute
+        image_tag = driver.find_element(By.CSS_SELECTOR, "img.cursor-pointer.rounded-base")
+        image_src = image_tag.get_attribute("src")
+        print(f"Image source URL: {image_src}")
+        image_name = "downloaded_image.jpg"  # Save the image with this name
+        response = requests.get(image_src)
+        if response.status_code == 200:
+            with open(image_name, "wb") as file:
+                file.write(response.content)
+            print(f"Image downloaded and saved as {image_name}")
+        else:
+            print("Failed to download the image.")
+
     else:
         print("No images found with the specified class.")
 
