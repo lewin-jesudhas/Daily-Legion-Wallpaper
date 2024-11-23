@@ -14,16 +14,16 @@ driver = webdriver.Chrome(options=options)
 
 try:
     driver.get(WEBSITE_URL)
-    time.sleep(15)
+    time.sleep(10)  # Wait for the page to load completely
 
-    # Handle cookie consent or overlay (if present)
+    # Handle "Reject all optional cookies" button
     try:
-        overlay = driver.find_element(By.ID, "_evidon-background")
-        print("Overlay found, dismissing it...")
-        overlay.click()
-        time.sleep(2)  # Allow time for the overlay to disappear
+        reject_button = driver.find_element(By.ID, "_evidon-barrier-declinebutton")
+        print("Reject cookies button found, clicking it...")
+        reject_button.click()
+        time.sleep(2)  # Allow time for the button action to take effect
     except Exception as e:
-        print("No overlay detected, proceeding.")
+        print("No 'Reject all optional cookies' button detected, proceeding.")
 
     # Find all image divs
     image_divs = driver.find_elements(By.CLASS_NAME, "w-full.h-full.bg-cover")  # Adjust the class name if necessary
@@ -41,7 +41,7 @@ try:
         image_tag = driver.find_element(By.CSS_SELECTOR, "img.cursor-pointer.rounded-base")
         image_src = image_tag.get_attribute("src")
         print(f"Image source URL: {image_src}")
-        image_name = "downloaded_image.jpg"  # Save the image with this name
+        image_name = "downloaded_image.jpg"  
         response = requests.get(image_src)
         if response.status_code == 200:
             with open(image_name, "wb") as file:
